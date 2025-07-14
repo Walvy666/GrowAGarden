@@ -145,3 +145,148 @@ MainTab:CreateToggle({
         end
     end
 })
+
+-- Tab: Pets
+local PetsTab = Window:CreateTab("🐾 Pets", nil)
+
+PetsTab:CreateToggle({
+    Name = "Auto Equip Best Pets",
+    CurrentValue = false,
+    Callback = function(Value)
+        _G.AutoEquip = Value
+        while _G.AutoEquip do
+            game:GetService("ReplicatedStorage").Events.EquipBestPets:FireServer()
+            task.wait(5)
+        end
+    end
+})
+
+PetsTab:CreateToggle({
+    Name = "Auto Hatch Egg",
+    CurrentValue = false,
+    Callback = function(Value)
+        _G.AutoHatch = Value
+        while _G.AutoHatch do
+            game:GetService("ReplicatedStorage").Events.HatchEgg:FireServer("Basic Egg") -- ganti nama telur jika berbeda
+            task.wait(2)
+        end
+    end
+})
+
+PetsTab:CreateDropdown({
+    Name = "Choose Egg",
+    Options = {"Basic Egg", "Golden Egg", "Mystic Egg"},
+    CurrentOption = "Basic Egg",
+    Callback = function(Option)
+        _G.SelectedEgg = Option
+    end,
+})
+
+PetsTab:CreateButton({
+    Name = "Hatch Selected Egg Once",
+    Callback = function()
+        game:GetService("ReplicatedStorage").Events.HatchEgg:FireServer(_G.SelectedEgg or "Basic Egg")
+    end,
+})
+
+-- Tab: Shop
+local ShopTab = Window:CreateTab("🛒 Shop", nil)
+
+ShopTab:CreateToggle({
+    Name = "Auto Buy Tools",
+    CurrentValue = false,
+    Callback = function(Value)
+        _G.AutoTool = Value
+        while _G.AutoTool do
+            game:GetService("ReplicatedStorage").Events.BuyTool:FireServer("Best")
+            task.wait(2)
+        end
+    end
+})
+
+ShopTab:CreateToggle({
+    Name = "Auto Buy Seeds",
+    CurrentValue = false,
+    Callback = function(Value)
+        _G.AutoSeeds = Value
+        while _G.AutoSeeds do
+            game:GetService("ReplicatedStorage").Events.BuySeeds:FireServer("Best")
+            task.wait(2)
+        end
+    end
+})
+
+ShopTab:CreateToggle({
+    Name = "Auto Upgrade Backpack",
+    CurrentValue = false,
+    Callback = function(Value)
+        _G.AutoBackpack = Value
+        while _G.AutoBackpack do
+            game:GetService("ReplicatedStorage").Events.UpgradeBackpack:FireServer()
+            task.wait(3)
+        end
+    end
+})
+
+-- Tab: Teleport
+local TeleportTab = Window:CreateTab("🧭 Teleport", nil)
+
+local locations = {
+    ["Spawn"] = Vector3.new(0, 3, 0),
+    ["Shop"] = Vector3.new(100, 3, 0),
+    ["Garden"] = Vector3.new(-50, 3, 25),
+    ["Pet Area"] = Vector3.new(75, 3, 50)
+}
+
+for name, pos in pairs(locations) do
+    TeleportTab:CreateButton({
+        Name = "Teleport to "..name,
+        Callback = function()
+            game.Players.LocalPlayer.Character:MoveTo(pos)
+        end
+    })
+end
+
+-- Tab: ESP / Dialog UI
+local ESPTab = Window:CreateTab("🕵️ ESP/Dialog UI", nil)
+
+ESPTab:CreateButton({
+    Name = "Enable NPC Dialog UI",
+    Callback = function()
+        for _, npc in pairs(workspace:GetChildren()) do
+            if npc:FindFirstChild("Head") then
+                local Billboard = Instance.new("BillboardGui", npc.Head)
+                Billboard.Size = UDim2.new(0, 100, 0, 40)
+                Billboard.AlwaysOnTop = true
+
+                local TextLabel = Instance.new("TextLabel", Billboard)
+                TextLabel.Size = UDim2.new(1, 0, 1, 0)
+                TextLabel.Text = npc.Name
+                TextLabel.TextColor3 = Color3.new(1,1,1)
+                TextLabel.BackgroundTransparency = 1
+            end
+        end
+    end
+})
+
+-- Tab: Settings
+local SettingsTab = Window:CreateTab("⚙️ Settings", nil)
+
+SettingsTab:CreateDropdown({
+    Name = "Theme Color",
+    Options = {"Dark", "Blue", "Red", "Green", "Purple"},
+    CurrentOption = "Dark",
+    Callback = function(Option)
+        -- Tambah fungsional jika ingin mengubah UI warna
+        Rayfield:Notify({Title = "Theme", Content = Option.." theme selected!"})
+    end,
+})
+
+SettingsTab:CreateButton({
+    Name = "Destroy UI",
+    Callback = function()
+        Rayfield:Destroy()
+    end
+})
+
+SettingsTab:CreateParagraph({Title = "Credits", Content = "Script by WALVYKER 24\nInspired by LimitHub"})
