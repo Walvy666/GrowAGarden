@@ -288,6 +288,7 @@ ESPTab:CreateButton({
 
 -- ESP Egg GAG by Walvy
 Name = "ESP EGG",
+Callback = funtion()
 local function createESP(part, text)
     local billboard = Instance.new("BillboardGui")
     billboard.Adornee = part
