@@ -88,3 +88,60 @@ HomeTab:CreateSlider({
         setfpscap(Value)
     end,
 })
+
+-- Tab: Main
+local MainTab = Window:CreateTab("🌾 Main", nil)
+
+MainTab:CreateToggle({
+    Name = "Auto Farm",
+    CurrentValue = false,
+    Callback = function(Value)
+        _G.AutoFarm = Value
+        while _G.AutoFarm do
+            -- Contoh fungsi AutoFarm Grow a Garden (ganti sesuai game)
+            game:GetService("ReplicatedStorage").Events.Farm:FireServer()
+            task.wait(0.5)
+        end
+    end
+})
+
+MainTab:CreateToggle({
+    Name = "Auto Sell",
+    CurrentValue = false,
+    Callback = function(Value)
+        _G.AutoSell = Value
+        while _G.AutoSell do
+            game:GetService("ReplicatedStorage").Events.Sell:FireServer()
+            task.wait(1)
+        end
+    end
+})
+
+MainTab:CreateToggle({
+    Name = "Auto Water Plants",
+    CurrentValue = false,
+    Callback = function(Value)
+        _G.AutoWater = Value
+        while _G.AutoWater do
+            game:GetService("ReplicatedStorage").Events.Water:FireServer()
+            task.wait(2)
+        end
+    end
+})
+
+MainTab:CreateToggle({
+    Name = "Auto Collect Items",
+    CurrentValue = false,
+    Callback = function(Value)
+        _G.AutoCollect = Value
+        while _G.AutoCollect do
+            for _, item in pairs(game:GetService("Workspace").Drops:GetChildren()) do
+                if item:IsA("Part") and item:FindFirstChild("TouchInterest") then
+                    firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, item, 0)
+                    firetouchinterest(game.Players.LocalPlayer.Character.HumanoidRootPart, item, 1)
+                end
+            end
+            task.wait(0.5)
+        end
+    end
+})
