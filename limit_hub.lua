@@ -177,17 +177,170 @@ local function createToggle(parent, text)
         else
             switch.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
         end
+        -- Panggil fungsi yang sesuai
+        if text == "Hide Notification" then
+            -- Tambahkan fungsi untuk menyembunyikan notifikasi
+        elseif text == "Hide Backpack" then
+            -- Tambahkan fungsi untuk menyembunyikan tas
+        elseif text == "FPS Booster" then
+            toggleFpsBooster(toggled)
+        end
     end)
 
     return frame, switch
 end
 
-createToggle(PerformanceSection, "Hide Notification")
-createToggle(PerformanceSection, "Hide Backpack")
-createToggle(PerformanceSection, "FPS Booster")
+local function toggleFpsBooster(enabled)
+    if enabled then
+        -- Turunkan kualitas grafis untuk meningkatkan FPS
+        settings().Rendering.QualityLevel = "Level01"
+        -- Matikan bayangan
+        game.Lighting.GlobalShadows = false
+        -- Sembunyikan partikel yang tidak perlu
+        for _, v in pairs(workspace:GetDescendants()) do
+            if v:IsA("Part") and v.Name == "EffectParticle" then
+                v.Transparency = 1
+            end
+        end
+    else
+        -- Kembalikan kualitas grafis ke default
+        settings().Rendering.QualityLevel = "Automatic"
+        -- Aktifkan kembali bayangan
+        game.Lighting.GlobalShadows = true
+        -- Tampilkan kembali partikel
+        for _, v in pairs(workspace:GetDescendants()) do
+            if v:IsA("Part") and v.Name == "EffectParticle" then
+                v.Transparency = 0
+            end
+        end
+    end
+end
 
+local MainPage = Instance.new("Frame")
+MainPage.Name = "MainPage"
+MainPage.Parent = ContentFrame
+MainPage.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+MainPage.BackgroundTransparency = 1
+MainPage.Size = UDim2.new(1, 0, 1, 0)
+MainPage.Visible = false -- Sembunyikan secara default
+
+local MainLayout = Instance.new("UIListLayout")
+MainLayout.Parent = MainPage
+MainLayout.FillDirection = Enum.FillDirection.Vertical
+MainLayout.SortOrder = Enum.SortOrder.LayoutOrder
+MainLayout.Padding = UDim.new(0, 15)
+
+local autoFarmToggle, autoFarmSwitch = createToggle(MainPage, "Auto Farm")
+local autoWaterToggle, autoWaterSwitch = createToggle(MainPage, "Auto Water")
+local autoSellToggle, autoSellSwitch = createToggle(MainPage, "Auto Sell")
+
+
+local hideNotifToggle, hideNotifSwitch = createToggle(PerformanceSection, "Hide Notification")
+local hideBackpackToggle, hideBackpackSwitch = createToggle(PerformanceSection, "Hide Backpack")
+local fpsBoosterToggle, fpsBoosterSwitch = createToggle(PerformanceSection, "FPS Booster")
+
+local AutoFarm = {
+    Enabled = false,
+    Loop = nil
+}
+
+local function doAutoFarm()
+    -- Placeholder: Ganti dengan logika auto farm yang sebenarnya
+    print("Farming...")
+    -- Contoh:
+    -- local player = game.Players.LocalPlayer
+    -- local character = player.Character
+    -- local plot = game.Workspace.Plots[player.Name]
+    -- for _, plant in pairs(plot:GetChildren()) do
+    --     if plant.ClassName == "Model" and plant:FindFirstChild("Water") then
+    --         -- Siram tanaman
+    --     end
+    -- end
+end
+
+local _, autoFarmToggle = createToggle(HomePage, "Auto Farm")
+autoFarmToggle.MouseButton1Click:Connect(function()
+    AutoFarm.Enabled = not AutoFarm.Enabled
+    if AutoFarm.Enabled then
+        AutoFarm.Loop = game:GetService("RunService").Heartbeat:Connect(doAutoFarm)
+    else
+        if AutoFarm.Loop then
+            AutoFarm.Loop:Disconnect()
+            AutoFarm.Loop = nil
+        end
+    end
+end)
+
+local ESP = {
+    Enabled = false,
+    Connections = {}
+}
+
+local function updateESP()
+    for _, v in pairs(ESP.Connections) do
+        v:Disconnect()
+    end
+    ESP.Connections = {}
+
+    if ESP.Enabled then
+        for _, plant in pairs(game.Workspace.Plants:GetChildren()) do
+            local billboard = Instance.new("BillboardGui")
+            billboard.Parent = plant
+            billboard.Size = UDim2.new(0, 100, 0, 50)
+            billboard.AlwaysOnTop = true
+
+            local label = Instance.new("TextLabel")
+            label.Parent = billboard
+            label.Size = UDim2.new(1, 0, 1, 0)
+            label.Text = plant.Name
+            label.TextColor3 = Color3.fromRGB(255, 255, 255)
+            label.BackgroundTransparency = 1
+
+            table.insert(ESP.Connections, plant.AncestryChanged:Connect(function()
+                updateESP()
+            end))
+        end
+    end
+end
+
+local _, espToggle = createToggle(HomePage, "Plant ESP")
+espToggle.MouseButton1Click:Connect(function()
+    ESP.Enabled = not ESP.Enabled
+    updateESP()
+end)
+
+local function setWalkSpeed(speed)
+    local player = game.Players.LocalPlayer
+    local character = player.Character
+    if character and character:FindFirstChild("Humanoid") then
+        character.Humanoid.WalkSpeed = speed
+    end
+end
+
+local function setJumpPower(power)
+    local player = game.Players.LocalPlayer
+    local character = player.Character
+    if character and character:FindFirstChild("Humanoid") then
+        character.Humanoid.JumpPower = power
+    end
+end
+
+-- Placeholder for slider creation
+-- local speedSlider = createSlider(HomePage, "WalkSpeed", 16, 100, function(value)
+--     setWalkSpeed(value)
+-- end)
 
 -- Functionality
+HomeButton.MouseButton1Click:Connect(function()
+    HomePage.Visible = true
+    MainPage.Visible = false
+end)
+
+MainButton.MouseButton1Click:Connect(function()
+    HomePage.Visible = false
+    MainPage.Visible = true
+end)
+
 CloseButton.MouseButton1Click:Connect(function()
     ScreenGui:Destroy()
 end)
