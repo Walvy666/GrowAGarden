@@ -294,7 +294,7 @@ Rayfield:CreateToggle({
     Callback = function(Value)
         ESPActive = Value
         if ESPActive then
-            loadstring(game:HttpGet("https://pastebin.com/raw/vhkfpzAW/ESP_Telur.lua"))() -- ganti dengan raw link GitHub kamu
+            loadstring(game:HttpGet("https://pastebin.com/raw/vhkfpzAW"))() -- ganti dengan raw link GitHub kamu
         end
     end,
 })
