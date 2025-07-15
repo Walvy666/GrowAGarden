@@ -287,17 +287,60 @@ ESPTab:CreateButton({
 })
 
 -- Walvy ESP Grow a Garden: Egg + Pet Inside, optimized
-ESPActive = false
-Rayfield:CreateToggle({
-    Name = "ESP Telur (Lihat Isi)",
-    CurrentValue = false,
-    Callback = function(Value)
-        ESPActive = Value
-        if ESPActive then
-            loadstring(game:HttpGet("https://pastebin.com/raw/vhkfpzAW"))() -- ganti dengan raw link GitHub kamu
+--[[
+  ESP Telur Grow a Garden v1.2
+  Buatan Walvyker24 — Menampilkan isi telur (nama hewan, berat, rarity, type)
+]]
+
+local function createESP(egg)
+    if egg:FindFirstChild("EggESP") then return end
+    local petData = egg:FindFirstChild("PetData")
+    if not petData then return end
+
+    -- Ambil info pet
+    local name = petData:FindFirstChild("Name") and petData.Name.Value or "???"
+    local weight = petData:FindFirstChild("Weight") and petData.Weight.Value or 0
+    local rarity = petData:FindFirstChild("Rarity") and petData.Rarity.Value or "Unknown"
+    local ptype = petData:FindFirstChild("Type") and petData.Type.Value or "?"
+
+    -- Buat Billboard ESP
+    local esp = Instance.new("BillboardGui")
+    esp.Name = "EggESP"
+    esp.Size = UDim2.new(0, 220, 0, 70)
+    esp.AlwaysOnTop = true
+    esp.StudsOffset = Vector3.new(0, 3, 0)
+    esp.Parent = egg  -- Set parent after creation for better readability
+
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(1, 0, 1, 0)
+    label.BackgroundTransparency = 1
+    label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    label.TextStrokeTransparency = 0
+    label.Font = Enum.Font.GothamBold
+    label.TextScaled = true
+    label.Text = string.format("%s\n%.2f kg | %s\nType: %s", name, weight, rarity, ptype)
+    label.Parent = esp  -- Set parent after creation for better readability
+end
+
+-- Cek semua telur
+local function scanEggs()
+    for _, egg in pairs(workspace:GetDescendants()) do
+        if egg:IsA("Model") and egg.Name == "Egg" then
+            createESP(egg)
         end
-    end,
-})
+    end
+end
+
+-- Saat telur baru muncul
+workspace.DescendantAdded:Connect(function(obj)
+    if obj:IsA("Model") and obj.Name == "Egg" then
+        wait(0.5)  -- Consider using a more efficient method than wait
+        createESP(obj)
+    end
+end)
+
+-- Jalankan awal
+scanEggs()
 
 --==[ SETTINGS TAB ]==--
 local SettingsTab = Window:CreateTab("⚙️ Settings", nil)
