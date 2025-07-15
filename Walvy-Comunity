@@ -286,42 +286,59 @@ ESPTab:CreateButton({
     end
 })
 
--- ESP Egg GAG by Walvy
-Name = "ESP EGG",
-Callback = funtion()
-local function createESP(part, text)
+-- Walvy ESP Grow a Garden: Egg + Pet Inside, optimized
+
+local function createESP(part, text, color, tagName)
+    -- Hindari duplikat ESP
+    if part:FindFirstChild(tagName or "ESPLabel") then return end
+
     local billboard = Instance.new("BillboardGui")
+    billboard.Name = tagName or "ESPLabel"
     billboard.Adornee = part
-    billboard.Size = UDim2.new(0, 100, 0, 20)
-    billboard.StudsOffset = Vector3.new(0, 2, 0)
+    billboard.Size = UDim2.new(0, 120, 0, 20)
+    billboard.StudsOffset = Vector3.new(0, 3, 0)
     billboard.AlwaysOnTop = true
 
-    local label = Instance.new("TextLabel", billboard)
+    local label = Instance.new("TextLabel")
     label.Size = UDim2.new(1, 0, 1, 0)
-    label.Text = text
     label.BackgroundTransparency = 1
-    label.TextColor3 = Color3.fromRGB(255, 255, 0)
-    label.TextStrokeTransparency = 0.5
-    label.Font = Enum.Font.SourceSansBold
+    label.TextColor3 = color or Color3.fromRGB(255, 255, 0)
+    label.TextStrokeTransparency = 0.3
+    label.Font = Enum.Font.GothamBold
     label.TextScaled = true
+    label.Text = text
+    label.Parent = billboard
 
     billboard.Parent = part
 end
 
-local function espEggs()
-    for _, v in pairs(game:GetService("Workspace"):GetDescendants()) do
-        if v:IsA("Part") or v:IsA("MeshPart") or v:IsA("BasePart") then
-            if v.Name:lower():find("egg") and not v:FindFirstChildOfClass("BillboardGui") then
-                createESP(v, "🥚 Egg")
+local function scanEggs()
+    local workspace = game:GetService("Workspace")
+    for _, egg in pairs(workspace:GetDescendants()) do
+        if (egg:IsA("Part") or egg:IsA("MeshPart") or egg:IsA("BasePart")) and egg.Name:lower():find("egg") then
+            -- Buat ESP untuk Egg-nya sendiri
+            createESP(egg, "🥚 Egg", Color3.fromRGB(255, 255, 0), "EggESP")
+
+            -- Cari TextLabel yang menampilkan nama hewan di atas telur
+            if egg.Parent and egg.Parent:IsA("Model") then
+                for _, child in pairs(egg.Parent:GetDescendants()) do
+                    if child:IsA("TextLabel") or child:IsA("TextMesh") then
+                        local petName = child.Text
+                        if petName and #petName > 2 and not egg:FindFirstChild("PetNameESP") then
+                            createESP(egg, "🐾 " .. petName, Color3.fromRGB(150, 255, 255), "PetNameESP")
+                        end
+                    end
+                end
             end
         end
     end
 end
 
--- Jalankan ESP setiap 3 detik (untuk mendeteksi telur baru yang muncul)
-while task.wait(3) do
-    pcall(espEggs)
+-- Loop ringan, optimisasi, jalankan hanya setiap 2 detik
+while task.wait(2) do
+    pcall(scanEggs)
 end
+
 
 --==[ SETTINGS TAB ]==--
 local SettingsTab = Window:CreateTab("⚙️ Settings", nil)
