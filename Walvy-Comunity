@@ -288,21 +288,19 @@ ESPTab:CreateButton({
 
 -- Walvy ESP Grow a Garden: Egg + Pet Inside, optimized
 local function createESP(egg)
-    -- Cek apakah sudah ada ESP
     if egg:FindFirstChild("EggESP") then return end
-
-    -- Cek apakah ada data hewan di dalam telur
     local petData = egg:FindFirstChild("PetData")
     if not petData then return end
 
-    -- Ambil data nama dan berat
-    local petName = petData:FindFirstChild("Name") and petData.Name.Value or "??"
-    local petWeight = petData:FindFirstChild("Weight") and petData.Weight.Value or 0
+    local petName   = (petData:FindFirstChild("Name")   and petData.Name.Value)   or "Unknown"
+    local petWeight = (petData:FindFirstChild("Weight") and petData.Weight.Value) or 0
+    local petRarity = (petData:FindFirstChild("Rarity") and petData.Rarity.Value) or "?"
+    local petType   = (petData:FindFirstChild("Type")   and petData.Type.Value)   or "?"
 
-    -- Buat BillboardGui
+    -- GUI Billboard
     local esp = Instance.new("BillboardGui", egg)
     esp.Name = "EggESP"
-    esp.Size = UDim2.new(0, 200, 0, 50)
+    esp.Size = UDim2.new(0, 220, 0, 70)
     esp.AlwaysOnTop = true
     esp.StudsOffset = Vector3.new(0, 3, 0)
 
@@ -312,27 +310,12 @@ local function createESP(egg)
     label.TextColor3 = Color3.fromRGB(255, 255, 255)
     label.TextStrokeTransparency = 0
     label.Font = Enum.Font.GothamBold
-    label.TextScaled = true
-    label.Text = string.format("%s\n%.2f kg", petName, petWeight)
+    label.TextScaled = false
+    label.Text = string.format(
+      "%s\n%.2f kg • %s\nType: %s",
+      petName, petWeight, petRarity, petType
+    )
 end
-
--- Pindai telur di dunia
-local function scanEggs()
-    for _, obj in pairs(workspace:GetDescendants()) do
-        if obj:IsA("Model") and obj.Name == "Egg" then
-            createESP(obj)
-        end
-    end
-end
-
--- Jalankan saat telur baru muncul
-workspace.DescendantAdded:Connect(function(obj)
-    if obj:IsA("Model") and obj.Name == "Egg" then
-        wait(0.5) -- Tunggu properti dimuat
-        createESP(obj)
-    end
-end)
-
 
 --==[ SETTINGS TAB ]==--
 local SettingsTab = Window:CreateTab("⚙️ Settings", nil)
